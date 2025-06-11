@@ -4,8 +4,8 @@ import 'package:hijri/hijri_calendar.dart';
 class CalendarController extends GetxController {
   var currentDate = DateTime.now().obs;
   var hijriDate = HijriCalendar.fromDate(DateTime.now()).obs;
+  var selectedHijriDate = HijriCalendar.fromDate(DateTime.now()).obs;
 
-  // List of Hijri months
   static const List<String> hijriMonths = [
     'Muharram',
     'Safar',
@@ -21,31 +21,32 @@ class CalendarController extends GetxController {
     'Dhul-Hijjah',
   ];
 
-  // List of Islamic events
   final List<Map<String, String>> islamicEvents = [
     {'hDate': '1 Ramadan', 'event': 'Start of Ramadan'},
     {'hDate': '1 Shawwal', 'event': 'Eid al-Fitr'},
     {'hDate': '10 Dhul-Hijjah', 'event': 'Eid al-Adha'},
   ];
 
-  List<Map<String, String>> getEventsForMonth(String hMonthName) {
-    return islamicEvents
-        .where((event) => event['hDate']!.contains(hMonthName))
-        .toList();
-  }
+  List<Map<String, String>> getAllEvents() => islamicEvents;
 
   void updateMonth(int increment) {
     currentDate.value =
         DateTime(currentDate.value.year, currentDate.value.month + increment);
     hijriDate.value = HijriCalendar.fromDate(currentDate.value);
+    selectedHijriDate.value = HijriCalendar()
+      ..hYear = hijriDate.value.hYear
+      ..hMonth = hijriDate.value.hMonth
+      ..hDay = 1;
   }
 
-  String formatIslamicDate(HijriCalendar hijriDate) {
-    final hMonthIndex = hijriDate.hMonth - 1;
-    final hMonthName = (hMonthIndex >= 0 && hMonthIndex < hijriMonths.length)
-        ? hijriMonths[hMonthIndex]
-        : 'Unknown';
+  void selectDate(HijriCalendar date) {
+    selectedHijriDate.value = date;
+  }
 
-    return '${hijriDate.hDay} $hMonthName ${hijriDate.hYear} AH';
+  bool isTodayHijri(HijriCalendar date) {
+    final todayHijri = HijriCalendar.fromDate(DateTime.now());
+    return date.hDay == todayHijri.hDay &&
+        date.hMonth == todayHijri.hMonth &&
+        date.hYear == todayHijri.hYear;
   }
 }
