@@ -1,0 +1,13 @@
+flutter_native_splash:
+  color: '#FFFFFF'
+  color_dark: '#272727'
+  image: assets/vectors/albani_logo.png
+  image_dark: assets/vectors/albani_logo.png
+
+  android_12:
+    color: '#FFFFFF'
+    color_dark: '#272727'
+    image: assets/vectors/albani_logo.png
+    image_dark: assets/vectors/albani_logo.png
+
+  web: false

@@ -1,0 +1,76 @@
+name: albani
+description: "A new Flutter project."
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  get: ^4.6.6
+  google_sign_in: ^6.2.2
+  adhan: ^2.0.0+1
+  intl: ^0.18.0
+  geolocator: ^9.0.1
+  geocoding: ^2.0.0
+  iconsax: ^0.0.8
+  http: ^1.2.2
+  hijri: ^3.0.0
+  flutter_secure_storage: ^9.0.0
+  get_storage: ^2.1.1
+  cupertino_icons: ^1.0.6
+  flutter_native_splash: ^2.4.0
+  flutter_svg: ^2.0.10+1
+  path_provider:
+  just_audio:
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - assets/fonts/
+    - assets/images/
+    - assets/vectors/
+    - assets/audio/Talkhis_1.mp3
+
+  fonts:
+    - family: Satoshi
+      fonts:
+        - asset: assets/fonts/Satoshi-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Satoshi-Bold.ttf
+          weight: 600
+        - asset: assets/fonts/Satoshi-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Satoshi-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Satoshi-Light.ttf
+          weight: 300
+        
+flutter_native_splash:
+  color: '#FFFFFF'
+  color_dark: '#272727'
+  image: assets/vectors/albani_logo.png
+  image_dark: assets/vectors/albani_logo.png
+
+  android_12:
+    color: '#FFFFFF'
+    color_dark: '#272727'
+    image: assets/vectors/albani_logo.png
+    image_dark: assets/vectors/albani_logo.png
+
+  web: false
+
