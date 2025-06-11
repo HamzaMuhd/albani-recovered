@@ -106,10 +106,10 @@ class CalendarScreen extends StatelessWidget {
                 final hDateStr = '$hijriDay $hMonthName';
 
                 final isToday = controller.isTodayHijri(date);
-                final isSelected = controller.selectedHijriDate.value.hDay ==
-                        date.hDay &&
-                    controller.selectedHijriDate.value.hMonth == date.hMonth &&
-                    controller.selectedHijriDate.value.hYear == date.hYear;
+                final isSelected = controller.isSameHijriDate(
+                  controller.selectedHijriDate.value,
+                  date,
+                );
                 final isEvent = controller
                     .getAllEvents()
                     .any((event) => event['hDate'] == hDateStr);
@@ -121,7 +121,9 @@ class CalendarScreen extends StatelessWidget {
                         ? Colors.blueAccent.withOpacity(0.7)
                         : isEvent
                             ? Colors.amberAccent.withOpacity(0.6)
-                            : (isToday ? AppColors.primary : Colors.white),
+                            : isToday
+                                ? AppColors.primary
+                                : Colors.white,
                     elevation: 2.0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -134,7 +136,9 @@ class CalendarScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isToday ? Colors.white : Colors.black,
+                            color: isSelected || isToday
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                         if (isEvent)

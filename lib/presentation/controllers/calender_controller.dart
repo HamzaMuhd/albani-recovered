@@ -49,4 +49,8 @@ class CalendarController extends GetxController {
         date.hMonth == todayHijri.hMonth &&
         date.hYear == todayHijri.hYear;
   }
+
+  bool isSameHijriDate(HijriCalendar a, HijriCalendar b) {
+    return a.hDay == b.hDay && a.hMonth == b.hMonth && a.hYear == b.hYear;
+  }
 }
