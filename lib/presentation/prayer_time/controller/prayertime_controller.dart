@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:adhan/adhan.dart';
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -22,6 +23,36 @@ class PrayerTimesController extends GetxController {
   var isLocationFetched = false.obs;
   var isFetching = false.obs;
   final _storage = GetStorage();
+
+  static void showSuccess({
+    required String message,
+  }) {
+    Get.snackbar(
+      "Success 🎉",
+      message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green.shade400,
+      colorText: Colors.white,
+      icon: const Icon(Icons.check_circle, color: Colors.white),
+      margin: const EdgeInsets.all(15),
+      duration: const Duration(seconds: 5),
+    );
+  }
+
+  static void showError({
+    required String errorMessage,
+  }) {
+    Get.snackbar(
+      "Error 😞",
+      errorMessage,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.red.shade400,
+      colorText: Colors.white,
+      icon: const Icon(Icons.error, color: Colors.white),
+      margin: const EdgeInsets.all(15),
+      duration: const Duration(seconds: 5),
+    );
+  }
 
   @override
   void onInit() {
@@ -49,7 +80,8 @@ class PrayerTimesController extends GetxController {
       // Check if location services are enabled
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw Exception('Location services are disabled.');
+        await Geolocator.openLocationSettings();
+        throw 'Please enable location services.';
       }
 
       permission = await Geolocator.checkPermission();
@@ -57,7 +89,7 @@ class PrayerTimesController extends GetxController {
         permission = await Geolocator.requestPermission();
         if (permission != LocationPermission.whileInUse &&
             permission != LocationPermission.always) {
-          throw Exception('Location permission is denied');
+          throw 'Location permission is denied';
         }
       }
 
@@ -67,9 +99,14 @@ class PrayerTimesController extends GetxController {
       _saveLocation(position.latitude, position.longitude); // Save location
       await getLocationName(position.latitude, position.longitude);
       updatePrayerTimes(position.latitude, position.longitude);
+
+      showSuccess(
+          message: 'Location fetched and prayer times updated successfully.');
     } catch (e) {
-      print('Error fetching location: $e');
-      return Future.error('Error fetching location');
+      final errorMessage =
+          e is String ? e : 'An unexpected error occurred. Please try again.';
+      showError(errorMessage: errorMessage);
+      return Future.error(errorMessage);
     } finally {
       isFetching.value = false; // Set fetching to false when the process ends
     }
