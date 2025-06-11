@@ -68,8 +68,8 @@ class AuthController extends GetxController {
 
   Future<void> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? account = await googleSignIn.signIn();
       isLoading.value = true;
+      final GoogleSignInAccount? account = await googleSignIn.signIn();
       if (account == null) {
         print('Login aborted');
         return;
