@@ -1,8 +1,8 @@
 import 'package:albani/common/widgets/appbar/app_bar.dart';
-import 'package:albani/core/configs/assets/app_images.dart';
 import 'package:albani/core/configs/constants/app_urls.dart';
 import 'package:albani/core/configs/theme/app_colors.dart';
 import 'package:albani/presentation/auth/controller/auth_controller.dart';
+import 'package:albani/presentation/auth/pages/signup_or_signin.dart';
 import 'package:albani/presentation/profile_pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,42 +45,75 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _profileInfo(BuildContext context) {
-    final user = authController.user.value;
-    return Container(
-      height: MediaQuery.of(context).size.height / 3.5,
-      width: double.infinity,
-      decoration: BoxDecoration(
-          color: context.isDarkMode ? const Color(0xff2C2828) : Colors.white,
-          borderRadius: const BorderRadius.only(
-              bottomRight: Radius.circular(50),
-              bottomLeft: Radius.circular(50))),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            height: 90,
-            width: 90,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(user.picture ??
-                        "https://img.icons8.com/?size=100&id=14736&format=png&color=000000"))),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Text(user.email ?? 'No'),
-          const SizedBox(
-            height: 10,
-          ),
-          Text(
-            user.fullname ?? "No",
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
+    return Obx(() {
+      final user = authController.user.value;
+      final isLoggedIn = authController.isLoggedIn;
+      return Container(
+        height: MediaQuery.of(context).size.height / 3.5,
+        width: double.infinity,
+        decoration: BoxDecoration(
+            color: context.isDarkMode ? const Color(0xff2C2828) : Colors.white,
+            borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(50),
+                bottomLeft: Radius.circular(50))),
+        child: isLoggedIn
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 90,
+                    width: 90,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(user.picture ??
+                                "https://img.icons8.com/?size=100&id=14736&format=png&color=000000"))),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Text(user.email ?? 'No'),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    user.fullname ?? "No",
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.person, size: 80, color: Colors.grey),
+                  const SizedBox(height: 10),
+                  const Text("You are not logged in"),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.to(() => SignupOrSigninPage());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text(
+                      "Login or Sign Up",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+      );
+    });
   }
 
   Widget _favoriteSong() {

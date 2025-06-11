@@ -21,7 +21,7 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       title: title ?? const Text(""),
       actions: [action ?? Container()],
-      leading: hideBack
+      leading: (hideBack || !(ModalRoute.of(context)?.canPop ?? false))
           ? null
           : IconButton(
               icon: Container(

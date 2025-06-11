@@ -14,7 +14,7 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final AuthController auth = Get.put(AuthController());
     bool isFirstTime = GetStorage().read('isFirstTime') ?? true;
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 2), () {
       final target = auth.isLoggedIn
           ? const NavigationMenu()
           : isFirstTime

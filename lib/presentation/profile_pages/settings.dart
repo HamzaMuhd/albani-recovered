@@ -1,7 +1,9 @@
 import 'package:albani/common/widgets/appbar/app_bar.dart'; // Ensure this is correct
 import 'package:albani/core/configs/assets/app_vectors.dart';
 import 'package:albani/core/configs/theme/app_colors.dart';
+import 'package:albani/navigation_menu.dart';
 import 'package:albani/presentation/auth/controller/auth_controller.dart';
+import 'package:albani/presentation/auth/pages/signup_or_signin.dart';
 import 'package:albani/presentation/choose_language/controller/language_controller.dart';
 import 'package:albani/presentation/profile_pages/custom_darkmode_toggle.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LanguageController languageController = Get.put(LanguageController());
+    final AuthController authController = Get.put(AuthController());
 
     return Scaffold(
       appBar: const BasicAppbar(
@@ -90,27 +93,48 @@ class SettingsPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      showLogoutDialog(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 14, horizontal: 32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: const Text(
-                      'Logout',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                  ),
+                  child: authController.isLoggedIn
+                      ? ElevatedButton(
+                          onPressed: () {
+                            showLogoutDialog(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 32),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 5,
+                          ),
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        )
+                      : ElevatedButton(
+                          onPressed: () {
+                            Get.to(() => SignupOrSigninPage());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 32),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 5,
+                          ),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -236,6 +260,7 @@ Future<void> showLogoutDialog(BuildContext context) async {
                   ElevatedButton(
                     onPressed: () {
                       controller.logout();
+                      Get.to(() => const NavigationMenu());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,

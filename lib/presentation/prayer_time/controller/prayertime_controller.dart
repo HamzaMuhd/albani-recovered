@@ -81,7 +81,21 @@ class PrayerTimesController extends GetxController {
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         await Geolocator.openLocationSettings();
-        throw 'Please enable location services.';
+
+        bool isEnabled = false;
+        int retries = 0;
+        while (!isEnabled && retries < 5) {
+          await Future.delayed(const Duration(seconds: 2));
+          isEnabled = await Geolocator.isLocationServiceEnabled();
+          retries++;
+        }
+
+        if (!isEnabled) {
+          showError(
+              errorMessage:
+                  'Location still not enabled, please enable location services.');
+          return;
+        }
       }
 
       permission = await Geolocator.checkPermission();
@@ -101,7 +115,7 @@ class PrayerTimesController extends GetxController {
       updatePrayerTimes(position.latitude, position.longitude);
 
       showSuccess(
-          message: 'Location fetched and prayer times updated successfully.');
+          message: 'Prayer times have been updated based on your location.');
     } catch (e) {
       final errorMessage =
           e is String ? e : 'An unexpected error occurred. Please try again.';
