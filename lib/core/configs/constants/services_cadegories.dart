@@ -1,4 +1,5 @@
 import 'package:albani/core/configs/assets/app_vectors.dart';
+import 'package:albani/presentation/audio/audio.dart';
 import 'package:albani/presentation/azkar/azkar.dart';
 import 'package:albani/presentation/calender/calender.dart';
 import 'package:albani/presentation/prayer_time/pages/prayer_screen.dart';
@@ -8,7 +9,7 @@ import 'package:get/get.dart';
 class CategoriesData {
   static final List<Category> categories = [
     Category(
-      title: 'Akzar',
+      title: 'Azkar',
       image: AppVectors.prayer,
       onTap: () => Get.to(() => const AzkarScreen()),
     ),
@@ -30,7 +31,7 @@ class CategoriesData {
     Category(
       title: 'Audio',
       image: AppVectors.audio,
-      onTap: () => Get.to(() => ()),
+      onTap: () => Get.to(() => const AudioScreen()),
     ),
   ];
 }

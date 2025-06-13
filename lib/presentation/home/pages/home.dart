@@ -61,7 +61,8 @@ class _HomePageState extends State<HomePage>
               context: context,
               tabController: _tabController,
             ),
-            const PlayList()
+            const SizedBox(height: 20),
+            const SizedBox(height: 300, child: PlayList())
           ],
         ),
       ),

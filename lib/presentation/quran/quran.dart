@@ -1,3 +1,4 @@
+import 'package:albani/common/widgets/appbar/app_bar.dart';
 import 'package:albani/core/configs/theme/app_colors.dart';
 import 'package:albani/presentation/controllers/quran_controller.dart';
 import 'package:albani/presentation/quran/juz_list.dart';
@@ -61,12 +62,16 @@ class QuranScreen extends StatelessWidget {
         );
       }
 
-      return DefaultTabController(
+      return const DefaultTabController(
         length: 3,
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Quran'),
-            bottom: const TabBar(
+          appBar: BasicAppbar(
+            title: Text(
+              'Quran',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.transparent,
+            bottom: TabBar(
               indicatorColor: AppColors.primary,
               labelColor: AppColors.primary,
               tabs: [
@@ -76,7 +81,7 @@ class QuranScreen extends StatelessWidget {
               ],
             ),
           ),
-          body: const TabBarView(
+          body: TabBarView(
             children: [
               SurahList(),
               JuzList(),

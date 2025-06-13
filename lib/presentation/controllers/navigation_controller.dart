@@ -1,7 +1,9 @@
 import 'package:albani/core/configs/assets/app_vectors.dart';
+import 'package:albani/presentation/audio/audio.dart';
 import 'package:albani/presentation/home/pages/home.dart';
 import 'package:albani/presentation/prayer_time/pages/prayer_screen.dart';
 import 'package:albani/presentation/profile_pages/profile.dart';
+import 'package:albani/presentation/quran/quran.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -39,8 +41,8 @@ class NavigationController extends GetxController {
   final screens = [
     const HomePage(),
     PrayerTimeScreen(),
-    const HomePage(),
-    const HomePage(),
+    const AudioScreen(),
+    const QuranScreen(),
     ProfilePage(),
   ];
 }
