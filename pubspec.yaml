@@ -28,6 +28,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   path_provider:
   just_audio:
+  archive:
 
 
 dev_dependencies:
@@ -45,6 +46,8 @@ flutter:
     - assets/images/
     - assets/vectors/
     - assets/audio/Talkhis_1.mp3
+    - assets/pages_map.json
+    - assets/surahs_full.json
 
   fonts:
     - family: Satoshi

@@ -20,4 +20,11 @@ class ThemeController extends GetxController {
     themeMode.value = newThemeMode;
     _storage.write('theme', newThemeMode.index); // Save state persistently
   }
+
+  bool isDarkMode(BuildContext context) {
+    if (themeMode.value == ThemeMode.system) {
+      return MediaQuery.of(context).platformBrightness == Brightness.dark;
+    }
+    return themeMode.value == ThemeMode.dark;
+  }
 }

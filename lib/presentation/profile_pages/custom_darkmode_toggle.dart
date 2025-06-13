@@ -11,8 +11,7 @@ class CustomDarkModeToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool isDarkMode = themeController.themeMode.value == ThemeMode.dark;
-
+      final isDarkMode = themeController.isDarkMode(context);
       return GestureDetector(
         onTap: () {
           // Toggle between light and dark themes
