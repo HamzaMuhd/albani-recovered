@@ -1,13 +1,20 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/> 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
 
     <application
         android:label="Albani"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- <activity
+            android:name="com.ryanheise.audioservice.AudioServiceActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" /> -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -37,6 +44,15 @@
          <meta-data
             android:name="com.google.android.gms.client_id"
             android:value="429620588278-hn7lhb2gbj0aquvdod640ntv4k2crti1.apps.googleusercontent.com" />
+        <service
+            android:name="com.ryanheise.audioservice.AudioService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="MissingForegroundServiceType">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
 
     </application>
     <!-- Required to query activities that can process text, see:

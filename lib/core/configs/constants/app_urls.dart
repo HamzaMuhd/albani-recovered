@@ -7,4 +7,5 @@ class AppUrls {
   static const google = '${baseUrl}auth/google';
   static const login = '${baseUrl}auth/login';
   static const googleUrl = '${baseUrl}auth/google-login';
+  static const getSubUrl = '${baseUrl}subcategories/category/';
 }

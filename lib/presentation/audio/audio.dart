@@ -1,12 +1,14 @@
-import 'package:albani/common/helpers/is_dark_mode.dart';
 import 'package:albani/common/widgets/appbar/app_bar.dart';
+import 'package:albani/core/configs/constants/audio_categories.dart';
+import 'package:albani/presentation/controllers/audio_controller.dart';
 import 'package:albani/presentation/home/widgets/audio_tab.dart';
 import 'package:albani/presentation/home/widgets/play_list.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AudioScreen extends StatelessWidget {
-  const AudioScreen({super.key});
-
+  AudioScreen({super.key});
+  final AudioController controller = Get.put(AudioController());
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -19,25 +21,35 @@ class AudioScreen extends StatelessWidget {
           ),
           backgroundColor: Colors.transparent,
         ),
-        body: Builder(
-          builder: (context) {
-            final TabController tabController =
-                DefaultTabController.of(context);
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Search(),
-                const SizedBox(height: 20),
-                AudioTab(
-                  context: context,
-                  tabController: tabController,
-                ),
-                const SizedBox(height: 20),
-                const Expanded(child: PlayList()),
-              ],
-            );
-          },
-        ),
+        body: Builder(builder: (context) {
+          final TabController tabController = DefaultTabController.of(context);
+          tabController.addListener(() {
+            controller.currentTabIndex.value = tabController.index;
+          });
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Search(),
+              const SizedBox(height: 20),
+              AudioTab(
+                context: context,
+                tabController: tabController,
+                controller: controller,
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Obx(() {
+                  final categoryId =
+                      AudioCategories.all[controller.currentTabIndex.value].id;
+                  return PlayList(
+                    categoryId: categoryId,
+                    controller: controller,
+                  );
+                }),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }
@@ -62,7 +74,7 @@ class Search extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withAlpha((0.03 * 255).round()),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),

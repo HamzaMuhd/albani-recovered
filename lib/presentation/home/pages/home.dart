@@ -1,5 +1,7 @@
 import 'package:albani/common/widgets/appbar/app_bar.dart';
 import 'package:albani/core/configs/assets/app_vectors.dart';
+import 'package:albani/core/configs/constants/audio_categories.dart';
+import 'package:albani/presentation/controllers/audio_controller.dart';
 import 'package:albani/presentation/home/widgets/audio_tab.dart';
 import 'package:albani/presentation/home/widgets/home_categories.dart';
 import 'package:albani/presentation/home/widgets/home_top_card.dart';
@@ -21,11 +23,15 @@ class _HomePageState extends State<HomePage>
   late TabController _tabController;
   final PrayerTimesController prayerController =
       Get.put(PrayerTimesController());
-
+  final AudioController controller = Get.put(AudioController());
+  int currentTabIndex = 0;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(() {
+      controller.currentTabIndex.value = _tabController.index;
+    });
   }
 
   @override
@@ -60,9 +66,19 @@ class _HomePageState extends State<HomePage>
             AudioTab(
               context: context,
               tabController: _tabController,
+              controller: controller,
             ),
             const SizedBox(height: 20),
-            const SizedBox(height: 300, child: PlayList())
+            Obx(() {
+              final categoryId =
+                  AudioCategories.all[controller.currentTabIndex.value].id;
+              return SizedBox(
+                  height: 300,
+                  child: PlayList(
+                    categoryId: categoryId,
+                    controller: controller,
+                  ));
+            })
           ],
         ),
       ),

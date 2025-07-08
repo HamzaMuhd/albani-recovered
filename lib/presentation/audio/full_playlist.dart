@@ -1,31 +1,48 @@
-import 'package:albani/common/helpers/is_dark_mode.dart';
+import 'package:albani/common/helpers/string_extension.dart';
+import 'package:albani/common/helpers/time_formatter.dart';
 import 'package:albani/core/configs/theme/app_colors.dart';
-import 'package:albani/presentation/song_player/pages/song_player.dart';
+import 'package:albani/data/models/subcategories_model.dart';
+import 'package:albani/presentation/song_player/pages/audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class FullPlaylistScreen extends StatelessWidget {
-  const FullPlaylistScreen({super.key});
+  final String title;
+  final String author;
+  final List audios;
+  final String imageUrl;
+
+  const FullPlaylistScreen({
+    super.key,
+    required this.title,
+    required this.audios,
+    required this.author,
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Songs'),
+        title: Text(title),
         backgroundColor: Colors.transparent,
         foregroundColor: context.isDarkMode ? Colors.white : Colors.black,
         elevation: 0,
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemCount: 20,
+        itemCount: audios.length,
         separatorBuilder: (_, __) => const SizedBox(height: 20),
         itemBuilder: (context, index) {
+          final audio = audios[index];
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SongPlayer()),
-              );
+              Get.to(() => AudioPlayer(
+                    author: author,
+                    imageUrl: imageUrl,
+                    playlist: audios.cast<Audio>(),
+                    initialIndex: index,
+                  ));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,25 +66,25 @@ class FullPlaylistScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '01 SIFA',
-                          style: TextStyle(
+                          audio.title.toString().toTitleCase(),
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
-                          'Sheikh Albani Zaria',
-                          style: TextStyle(
+                          author,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w400, fontSize: 11),
-                        )
+                        ),
                       ],
                     ),
                   ],
                 ),
-                const Text('52:04'),
+                Text(formatDuration(parseDuration(audio.duration))),
               ],
             ),
           );

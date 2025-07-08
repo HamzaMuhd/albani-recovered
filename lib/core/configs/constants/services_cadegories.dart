@@ -31,7 +31,7 @@ class CategoriesData {
     Category(
       title: 'Audio',
       image: AppVectors.audio,
-      onTap: () => Get.to(() => const AudioScreen()),
+      onTap: () => Get.to(() => AudioScreen()),
     ),
   ];
 }

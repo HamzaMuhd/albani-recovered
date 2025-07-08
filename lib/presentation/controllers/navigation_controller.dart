@@ -41,7 +41,7 @@ class NavigationController extends GetxController {
   final screens = [
     const HomePage(),
     PrayerTimeScreen(),
-    const AudioScreen(),
+    AudioScreen(),
     const QuranScreen(),
     ProfilePage(),
   ];

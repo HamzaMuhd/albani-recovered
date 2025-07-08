@@ -4,6 +4,7 @@ import 'package:albani/core/configs/theme/app_colors.dart';
 import 'package:albani/presentation/auth/controller/auth_controller.dart';
 import 'package:albani/presentation/auth/pages/signup_or_signin.dart';
 import 'package:albani/presentation/profile_pages/settings.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -60,15 +61,27 @@ class ProfilePage extends StatelessWidget {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 90,
-                    width: 90,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(user.picture ??
-                                "https://img.icons8.com/?size=100&id=14736&format=png&color=000000"))),
+                  ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: user.picture ??
+                          "https://img.icons8.com/?size=100&id=14736&format=png&color=000000",
+                      height: 90,
+                      width: 90,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        height: 90,
+                        width: 90,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.person,
+                            size: 40, color: Colors.white),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        height: 90,
+                        width: 90,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.error, color: Colors.red),
+                      ),
+                    ),
                   ),
                   const SizedBox(
                     height: 15,
