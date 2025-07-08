@@ -109,13 +109,17 @@ class AudioPlayer extends StatelessWidget {
       return Column(
         children: [
           Slider(
-            value: position.inSeconds
+            value: controller.duration.value.inSeconds == 0
+                ? 0
+                : controller.position.value.inSeconds
+                    .toDouble()
+                    .clamp(0, controller.duration.value.inSeconds.toDouble()),
+            max: controller.duration.value.inSeconds
                 .toDouble()
-                .clamp(0, duration.inSeconds.toDouble()),
-            max: duration.inSeconds.toDouble(),
-            onChanged: (value) {
-              controller.seek(Duration(seconds: value.toInt()));
-            },
+                .clamp(1, double.infinity),
+            onChanged: controller.duration.value.inSeconds > 0
+                ? (value) => controller.seek(Duration(seconds: value.toInt()))
+                : null,
             activeColor: AppColors.primary,
             inactiveColor: Colors.grey[400],
           ),

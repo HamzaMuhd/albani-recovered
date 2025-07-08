@@ -1,31 +1,35 @@
 import 'package:albani/data/models/subcategories_model.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
 class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   final _player = AudioPlayer();
   final _playlist = <MediaItem>[];
+  final _durationController = BehaviorSubject<Duration>.seeded(Duration.zero);
+
+  Stream<Duration> get durationStream => _durationController.stream;
 
   MyAudioHandler() {
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
 
-    // Broadcast current media item to audio_service
     _player.currentIndexStream.listen((index) {
       if (index != null && index < _playlist.length) {
         mediaItem.add(_playlist[index]);
       }
     });
 
-    // Optional: Listen to duration changes
     _player.durationStream.listen((d) {
-      final current = mediaItem.value;
-      if (current != null && d != null) {
-        mediaItem.add(current.copyWith(duration: d));
+      if (d != null) {
+        final current = mediaItem.value;
+        if (current != null) {
+          mediaItem.add(current.copyWith(duration: d));
+        }
+        _durationController.add(d);
       }
     });
   }
 
-  /// Transform JustAudio state to AudioService state
   PlaybackState _transformEvent(PlaybackEvent event) {
     return PlaybackState(
       controls: [

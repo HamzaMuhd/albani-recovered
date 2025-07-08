@@ -32,6 +32,7 @@ dependencies:
   just_audio:
   audio_service: ^0.18.10
   archive:
+  rxdart: ^0.28.0
 
 
 dev_dependencies:
