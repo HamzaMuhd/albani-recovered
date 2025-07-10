@@ -1,0 +1,1 @@
+/data/user_de/0/com.android.shell/files/bugreports/dumpstate-2025-07-10-16-42-56.zip: 1 file pulled. 38.6 MB/s (24562823 bytes in 0.607s)

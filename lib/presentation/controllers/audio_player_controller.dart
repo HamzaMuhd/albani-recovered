@@ -1,6 +1,6 @@
 import 'package:albani/data/models/subcategories_model.dart';
 import 'package:get/get.dart';
-import 'package:albani/main.dart';
+import 'package:albani/presentation/controllers/audio_handler.dart';
 
 class AudioPlayerController extends GetxController {
   final Rx<Duration> duration = Duration.zero.obs;
@@ -10,65 +10,64 @@ class AudioPlayerController extends GetxController {
   final Rx<Audio?> currentAudio = Rx<Audio?>(null);
 
   List<Audio> playlist = [];
+  final AudioPlayerService playerService = AudioPlayerService();
 
-  void loadPlaylist({
+  Future<void> loadPlaylist({
     required List<Audio> audios,
     required int startIndex,
     required String author,
     required String imageUrl,
-  }) {
+  }) async {
     playlist = audios;
     currentIndex.value = startIndex;
     currentAudio.value = audios[startIndex];
-    audioHandler.playAudios(audios, startIndex,
-        author: author, imageUrl: imageUrl);
+
+    try {
+      await playerService.playAudios(audios, startIndex,
+          author: author, imageUrl: imageUrl);
+    } catch (e) {
+      print("Audio play error: $e");
+    }
   }
 
   @override
   void onInit() {
     super.onInit();
 
-    audioHandler.playbackState.listen((state) {
-      isPlaying.value = state.playing;
-      position.value = state.updatePosition;
+    playerService.player.positionStream.distinct().listen((pos) {
+      position.value = pos;
     });
 
-    audioHandler.mediaItem.listen((item) {
-      if (item != null) {
-        final index = playlist.indexWhere((audio) => audio.url == item.id);
-        if (index != -1) {
-          currentIndex.value = index;
-          currentAudio.value = playlist[index];
-        }
-      }
+    playerService.player.durationStream.distinct().listen((dur) {
+      if (dur != null) duration.value = dur;
     });
 
-    audioHandler.durationStream.listen((d) {
-      duration.value = d;
+    playerService.player.playingStream.distinct().listen((playing) {
+      isPlaying.value = playing;
     });
   }
 
-  void togglePlayPause() {
-    isPlaying.value ? audioHandler.pause() : audioHandler.play();
-  }
+  void togglePlayPause() => playerService.togglePlayPause();
 
   void nextAudio() {
     if (currentIndex.value < playlist.length - 1) {
-      currentIndex.value++;
-      currentAudio.value = playlist[currentIndex.value];
-      audioHandler.skipToQueueItem(currentIndex.value);
+      _jumpTo(currentIndex.value + 1);
     }
   }
 
   void previousAudio() {
     if (currentIndex.value > 0) {
-      currentIndex.value--;
-      currentAudio.value = playlist[currentIndex.value];
-      audioHandler.skipToQueueItem(currentIndex.value);
+      _jumpTo(currentIndex.value - 1);
     }
   }
 
-  void stopAudio() => audioHandler.stop();
+  void stopAudio() => playerService.stop();
 
-  void seek(Duration pos) => audioHandler.seek(pos);
+  void seek(Duration pos) => playerService.seek(pos);
+
+  void _jumpTo(int index) {
+    currentIndex.value = index;
+    currentAudio.value = playlist[index];
+    playerService.skipToIndex(index);
+  }
 }

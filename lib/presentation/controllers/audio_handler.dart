@@ -1,112 +1,57 @@
 import 'package:albani/data/models/subcategories_model.dart';
-import 'package:audio_service/audio_service.dart';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
-class MyAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
-  final _player = AudioPlayer();
-  final _playlist = <MediaItem>[];
-  final _durationController = BehaviorSubject<Duration>.seeded(Duration.zero);
+class AudioPlayerService {
+  final AudioPlayer _player = AudioPlayer();
 
-  Stream<Duration> get durationStream => _durationController.stream;
-
-  MyAudioHandler() {
-    _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
-
-    _player.currentIndexStream.listen((index) {
-      if (index != null && index < _playlist.length) {
-        mediaItem.add(_playlist[index]);
-      }
-    });
-
-    _player.durationStream.listen((d) {
-      if (d != null) {
-        final current = mediaItem.value;
-        if (current != null) {
-          mediaItem.add(current.copyWith(duration: d));
-        }
-        _durationController.add(d);
-      }
+  AudioPlayer get player => _player;
+  AudioPlayerService() {
+    // Log playback events to track state
+    _player.playbackEventStream.listen((event) {
+      debugPrint(
+          'Playback event: ${event.processingState}, playing=${_player.playing}');
     });
   }
 
-  PlaybackState _transformEvent(PlaybackEvent event) {
-    return PlaybackState(
-      controls: [
-        MediaControl.skipToPrevious,
-        _player.playing ? MediaControl.pause : MediaControl.play,
-        MediaControl.stop,
-        MediaControl.skipToNext,
-      ],
-      androidCompactActionIndices: const [0, 1, 3],
-      playing: _player.playing,
-      processingState: {
-        ProcessingState.idle: AudioProcessingState.idle,
-        ProcessingState.loading: AudioProcessingState.loading,
-        ProcessingState.buffering: AudioProcessingState.buffering,
-        ProcessingState.ready: AudioProcessingState.ready,
-        ProcessingState.completed: AudioProcessingState.completed,
-      }[_player.processingState]!,
-      updatePosition: _player.position,
-      bufferedPosition: _player.bufferedPosition,
-      updateTime: DateTime.now(),
-    );
-  }
+  Future<void> playAudios(List<Audio> audios, int startIndex,
+      {required String author, required String imageUrl}) async {
+    final sources = audios
+        .map((audio) => AudioSource.uri(
+              Uri.parse(audio.url),
+              tag: MediaItem(
+                id: audio.url,
+                title: audio.title,
+                album: 'Albani',
+                artist: author,
+                artUri: Uri.tryParse(imageUrl),
+              ),
+            ))
+        .toList();
 
-  Future<void> playAudios(
-    List<Audio> audios,
-    int startIndex, {
-    required String author,
-    required String imageUrl,
-  }) async {
-    _playlist.clear();
-
-    final mediaItems = audios.map((audio) {
-      return MediaItem(
-        id: audio.url,
-        title: audio.title,
-        album: 'Albani',
-        artist: author,
-        duration: Duration.zero,
-        artUri: Uri.tryParse(imageUrl),
+    try {
+      await _player.setAudioSources(
+        sources,
+        initialIndex: startIndex,
+        initialPosition: Duration.zero,
       );
-    }).toList();
 
-    _playlist.addAll(mediaItems);
-    queue.add(_playlist);
-
-    final sources =
-        audios.map((a) => AudioSource.uri(Uri.parse(a.url))).toList();
-    await _player.setAudioSource(ConcatenatingAudioSource(children: sources));
-    await skipToQueueItem(startIndex);
-    await play();
-  }
-
-  @override
-  Future<void> play() => _player.play();
-
-  @override
-  Future<void> pause() => _player.pause();
-
-  @override
-  Future<void> stop() async {
-    await _player.stop();
-    await super.stop();
-  }
-
-  @override
-  Future<void> seek(Duration position) => _player.seek(position);
-
-  @override
-  Future<void> skipToNext() => _player.seekToNext();
-
-  @override
-  Future<void> skipToPrevious() => _player.seekToPrevious();
-
-  @override
-  Future<void> skipToQueueItem(int index) async {
-    if (index >= 0 && index < _playlist.length) {
-      await _player.seek(Duration.zero, index: index);
+      await _player.play(); // ✅ Only start after setAudioSources
+    } catch (e) {
+      print("Error starting audio: $e");
     }
+  }
+
+  void togglePlayPause() => _player.playing ? _player.pause() : _player.play();
+
+  void stop() => _player.stop();
+  void seek(Duration position) => _player.seek(position);
+  void skipToNext() => _player.seekToNext();
+  void skipToPrevious() => _player.seekToPrevious();
+  void skipToIndex(int index) => _player.seek(Duration.zero, index: index);
+  void dispose() {
+    _player.dispose();
+    debugPrint('AudioPlayer disposed');
   }
 }

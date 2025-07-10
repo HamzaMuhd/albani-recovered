@@ -29,10 +29,10 @@ dependencies:
   flutter_native_splash: ^2.4.0
   flutter_svg: ^2.0.10+1
   path_provider:
-  just_audio:
-  audio_service: ^0.18.10
+  just_audio: ^0.10.4
+  just_audio_background: ^0.0.1-beta.17
   archive:
-  rxdart: ^0.28.0
+  permission_handler: ^12.0.1
 
 
 dev_dependencies:
@@ -49,7 +49,6 @@ flutter:
     - assets/fonts/
     - assets/images/
     - assets/vectors/
-    - assets/audio/Talkhis_1.mp3
     - assets/pages_map.json
     - assets/surahs_full.json
 
