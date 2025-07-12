@@ -13,12 +13,30 @@ class PrayerTimeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const BasicAppbar(
-        title: Text(
+      appBar: BasicAppbar(
+        title: const Text(
           'Prayer Times',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
+        action: Obx(() {
+          final isLoading = _controller.isFetching.value;
+          return IconButton(
+            icon: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.refresh),
+            tooltip: isLoading ? 'Refreshing…' : 'Refresh',
+            onPressed: isLoading ? null : _controller.getLocation,
+          );
+        }),
+        hideBack: true,
       ),
       body: Obx(() {
         if (_controller.isFetching.value) {

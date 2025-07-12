@@ -9,8 +9,9 @@ import 'package:get/get.dart';
 class FullPlaylistScreen extends StatelessWidget {
   final String title;
   final String author;
-  final List audios;
+  final List<Audio> audios;
   final String imageUrl;
+  final int playlistId;
 
   const FullPlaylistScreen({
     super.key,
@@ -18,6 +19,7 @@ class FullPlaylistScreen extends StatelessWidget {
     required this.audios,
     required this.author,
     required this.imageUrl,
+    required this.playlistId,
   });
 
   @override
@@ -38,9 +40,10 @@ class FullPlaylistScreen extends StatelessWidget {
           return GestureDetector(
             onTap: () {
               Get.to(() => AudioPlayer(
+                    playlistId: playlistId.toString(),
                     author: author,
                     imageUrl: imageUrl,
-                    playlist: audios.cast<Audio>(),
+                    playlist: audios,
                     initialIndex: index,
                   ));
             },

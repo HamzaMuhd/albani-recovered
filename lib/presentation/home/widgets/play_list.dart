@@ -4,7 +4,7 @@ import 'package:albani/common/helpers/time_formatter.dart';
 import 'package:albani/core/configs/theme/app_colors.dart';
 import 'package:albani/presentation/audio/full_playlist.dart';
 import 'package:albani/presentation/controllers/audio_controller.dart';
-import 'package:albani/presentation/song_player/pages/audio_player.dart'; // update this import path based on your structure
+import 'package:albani/presentation/song_player/pages/audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -52,6 +52,7 @@ class PlayList extends StatelessWidget {
                         audios: audios,
                         author: sub.author,
                         imageUrl: sub.imageUrl,
+                        playlistId: sub.id, // Pass subcategory ID
                       )),
                   child: const Text(
                     'See More',
@@ -76,6 +77,7 @@ class PlayList extends StatelessWidget {
                   return GestureDetector(
                     onTap: () {
                       Get.to(() => AudioPlayer(
+                            playlistId: sub.id.toString(),
                             author: sub.author,
                             imageUrl: sub.imageUrl,
                             playlist: audios,

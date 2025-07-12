@@ -223,8 +223,11 @@ class AuthController extends GetxController {
     if (authMethod == 'google') {
       await googleSignIn.signOut();
     }
-
-    storage.erase();
+    storage.remove('token');
+    storage.remove('user');
+    storage.remove('auth_method');
+    // Optionally clear all storage
+    // storage.erase();
     storage.write('isFirstTime', isFirstTime ?? false);
     Get.offAll(() => const NavigationMenu());
   }

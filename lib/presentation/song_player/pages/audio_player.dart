@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AudioPlayer extends StatefulWidget {
+  final String playlistId;
   final String author;
   final String imageUrl;
   final List<Audio> playlist;
@@ -15,6 +16,7 @@ class AudioPlayer extends StatefulWidget {
 
   const AudioPlayer({
     super.key,
+    required this.playlistId,
     required this.author,
     required this.imageUrl,
     required this.playlist,
@@ -26,19 +28,45 @@ class AudioPlayer extends StatefulWidget {
 }
 
 class _AudioPlayerScreenState extends State<AudioPlayer> {
-  final controller = Get.find<AudioPlayerController>();
+  late final AudioPlayerController controller;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      controller.loadPlaylist(
+    controller = Get.put(AudioPlayerController(), permanent: false);
+    Future.microtask(() async {
+      await _initializeController();
+    });
+  }
+
+  Future<void> _initializeController() async {
+    try {
+      await controller.resumeLastAudio(
+        playlistId: widget.playlistId,
+        audios: widget.playlist,
+        author: widget.author,
+        imageUrl: widget.imageUrl,
+        fallbackIndex: widget.initialIndex,
+        forceStartIndex: true,
+      );
+    } catch (e) {
+      print("Error initializing controller: $e");
+      // Fallback to direct load
+      await controller.loadPlaylist(
+        playlistId: widget.playlistId,
         audios: widget.playlist,
         startIndex: widget.initialIndex,
         author: widget.author,
         imageUrl: widget.imageUrl,
       );
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Save state when leaving the player
+    controller.saveState();
+    super.dispose();
   }
 
   @override
