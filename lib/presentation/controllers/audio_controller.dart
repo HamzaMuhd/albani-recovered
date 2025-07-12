@@ -52,8 +52,11 @@ class AudioController extends GetxController {
   }
 
   void onCategoryTabChanged(int categoryId) {
+    if (selectedCategoryId.value == categoryId) return;
+
     selectedCategoryId.value = categoryId;
-    if (searchQuery.value.isEmpty) {
+    if (!subcategoriesByCategory.containsKey(categoryId) &&
+        !loadingCategories.contains(categoryId)) {
       loadSubcategories(categoryId);
     }
   }

@@ -26,35 +26,50 @@ class AudioScreen extends StatelessWidget {
         body: Column(
           children: [
             SearchBar(controller: controller),
-            TabBar(
-              isScrollable: true,
-              tabAlignment: TabAlignment.center,
-              labelColor: context.isDarkMode ? Colors.white : Colors.black,
-              indicatorColor: AppColors.primary,
-              tabs: AudioCategories.all.map((c) => Tab(text: c.name)).toList(),
-              onTap: (index) => controller
-                  .onCategoryTabChanged(AudioCategories.all[index].id),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(left: 10, top: 10),
+              child: TabBar(
+                isScrollable: true,
+                tabAlignment: TabAlignment.center,
+                indicator: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab, // cover full tab
+                labelColor: AppColors.primary,
+                unselectedLabelColor:
+                    context.isDarkMode ? Colors.white70 : Colors.black87,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                unselectedLabelStyle:
+                    const TextStyle(fontWeight: FontWeight.normal),
+                tabs:
+                    AudioCategories.all.map((c) => Tab(text: c.name)).toList(),
+                onTap: (index) => controller
+                    .onCategoryTabChanged(AudioCategories.all[index].id),
+              ),
             ),
             Expanded(
               child: Obx(() {
                 final isSearching = controller.searchQuery.isNotEmpty;
-                final subcategories = isSearching
-                    ? controller.filteredSubcategories
-                    : controller.getSubcategoriesForSelectedTab();
+                final selectedCategory = controller.selectedCategoryId.value;
 
                 final isLoading = controller.isLoading.value ||
-                    controller.loadingCategories
-                        .contains(controller.selectedCategoryId.value);
+                    controller.loadingCategories.contains(selectedCategory);
                 final isOffline = controller.noInternet.value;
-                final isFailed = controller.failedCategoryIds
-                    .contains(controller.selectedCategoryId.value);
+                final isFailed =
+                    controller.failedCategoryIds.contains(selectedCategory);
+
+                final subcategories = isSearching
+                    ? controller.filteredSubcategories
+                    : controller.subcategoriesByCategory[selectedCategory];
 
                 if (isSearching && controller.searchQuery.value.length < 3) {
                   return const Center(
                       child: Text('Type at least 3 characters to search.'));
                 }
 
-                if (isLoading) {
+                if (isLoading || subcategories == null) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
@@ -80,90 +95,101 @@ class AudioScreen extends StatelessWidget {
                     ),
                     itemBuilder: (context, index) {
                       final sub = subcategories[index];
-
                       return GestureDetector(
                         onTap: () => Get.to(() => FullPlaylistScreen(
                               title: sub.name,
                               audios: sub.audios,
                               author: sub.author,
                               imageUrl: sub.imageUrl,
-                              playlistId: sub.id, // Pass subcategory ID
+                              playlistId: sub.id,
                             )),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: CachedNetworkImage(
-                                imageUrl: sub.imageUrl,
-                                imageBuilder: (context, imageProvider) =>
-                                    Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    image: DecorationImage(
-                                      image: imageProvider,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: Container(
-                                      height: 40,
-                                      width: 40,
-                                      transform:
-                                          Matrix4.translationValues(10, 10, 0),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: context.isDarkMode
-                                            ? AppColors.darkGrey
-                                            : const Color(0xffE6E6E6),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: context.isDarkMode
+                                ? Colors.grey[900]
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 6,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        child: CachedNetworkImage(
+                                          imageUrl: sub.imageUrl,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            color: Colors.grey[300],
+                                            child: const Center(
+                                              child: CircularProgressIndicator(
+                                                  strokeWidth: 2),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                            color: Colors.grey[300],
+                                            child: const Center(
+                                                child:
+                                                    Icon(Icons.broken_image)),
+                                          ),
+                                        ),
                                       ),
-                                      child: Icon(
-                                        Icons.play_arrow_rounded,
-                                        color: context.isDarkMode
-                                            ? const Color(0xff959595)
-                                            : const Color(0xff555555),
+                                      // Positioned(
+                                      //   top: 8,
+                                      //   right: 8,
+                                      //   child: CircleAvatar(
+                                      //     backgroundColor:
+                                      //         Colors.white.withOpacity(0.85),
+                                      //     child: const Icon(Icons.play_arrow,
+                                      //         color: AppColors.primary),
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        sub.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 15,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        sub.author,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                placeholder: (context, url) => Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    color: Colors.grey[300],
-                                  ),
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    color: Colors.grey[300],
-                                  ),
-                                  child: const Center(
-                                    child: Icon(Icons.broken_image),
-                                  ),
-                                ),
-                              ),
+                                )
+                              ],
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              sub.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              sub.author,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       );
                     },
@@ -188,7 +214,7 @@ class SearchBar extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500),
         height: 58,
-        margin: const EdgeInsets.symmetric(horizontal: 16),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color:
@@ -196,8 +222,8 @@ class SearchBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha((0.03 * 255).round()),
-              blurRadius: 6,
+              color: Colors.black.withAlpha(15),
+              blurRadius: 5,
               offset: const Offset(0, 3),
             ),
           ],
@@ -212,7 +238,7 @@ class SearchBar extends StatelessWidget {
                   hintText: 'Search topics or authors...',
                   hintStyle: TextStyle(fontSize: 14),
                   border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none, // removes focus glow
                   enabledBorder: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
@@ -221,8 +247,8 @@ class SearchBar extends StatelessWidget {
             ),
             Icon(
               Icons.search,
-              size: 30,
-              color: context.isDarkMode ? Colors.grey : const Color(0xff555555),
+              size: 26,
+              color: context.isDarkMode ? Colors.white70 : Colors.black54,
             ),
           ],
         ),
