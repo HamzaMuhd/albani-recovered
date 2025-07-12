@@ -50,12 +50,6 @@ class NewsSongs extends StatelessWidget {
               return GestureDetector(
                 onTap: () {
                   controller.selectSubcategory(categoryId, sub.id);
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (BuildContext context) => const SongPlayer(),
-                  //   ),
-                  // );
                 },
                 child: SizedBox(
                   width: 160,

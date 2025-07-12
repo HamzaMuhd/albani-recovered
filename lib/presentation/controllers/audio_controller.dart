@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:albani/core/configs/constants/appkey.dart';
 import 'package:albani/data/models/subcategories_model.dart';
@@ -15,13 +16,24 @@ class AudioController extends GetxController {
   final failedCategoryIds = <int>{}.obs;
   final noInternet = false.obs;
   final selectedSubcategoryId = <int, int?>{}.obs;
+
   final RxInt currentTabIndex = 0.obs;
+  final selectedCategoryId = 0.obs;
+
+  final RxString searchQuery = ''.obs;
+  final RxBool isLoading = false.obs;
+  final filteredSubcategories = <Subcategory>[].obs;
+
+  Timer? _debounce;
 
   @override
   void onInit() {
     super.onInit();
 
-    // Monitor network and retry
+    // Set default selected category
+    selectedCategoryId.value = 1; // default category id
+
+    // Monitor network and retry failed loads
     Connectivity().onConnectivityChanged.listen((status) async {
       if (status != ConnectivityResult.none) {
         noInternet.value = false;
@@ -36,6 +48,56 @@ class AudioController extends GetxController {
 
   void selectSubcategory(int categoryId, int subcategoryId) {
     selectedSubcategoryId[categoryId] = subcategoryId;
+    // Navigate to PlaylistScreen here if needed
+  }
+
+  void onCategoryTabChanged(int categoryId) {
+    selectedCategoryId.value = categoryId;
+    if (searchQuery.value.isEmpty) {
+      loadSubcategories(categoryId);
+    }
+  }
+
+  List<Subcategory> getSubcategoriesForSelectedTab() {
+    return subcategoriesByCategory[selectedCategoryId.value] ?? [];
+  }
+
+  void onSearchChanged(String query) {
+    searchQuery.value = query;
+
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (query.isEmpty || query.length < 3) {
+        filteredSubcategories.clear();
+      } else {
+        fetchSearchResults(query);
+      }
+    });
+  }
+
+  Future<void> fetchSearchResults(String query) async {
+    isLoading.value = true;
+    try {
+      final res = await http.get(
+        Uri.parse('${AppUrls.getSearchUrl}$query'),
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": AppStrings.apiKey,
+        },
+      );
+      if (res.statusCode == 200) {
+        final List jsonData = json.decode(res.body);
+        final List<Subcategory> result =
+            jsonData.map((e) => Subcategory.fromJson(e)).toList();
+        filteredSubcategories.value = result;
+      } else {
+        filteredSubcategories.clear();
+      }
+    } catch (_) {
+      filteredSubcategories.clear();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> loadSubcategories(int categoryId) async {
